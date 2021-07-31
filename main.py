@@ -1,4 +1,10 @@
 import merge
+import gui
+
+
+def launch():
+    app = gui.launch()
+    app.mainloop()
 
 
 def main():
@@ -11,4 +17,5 @@ def get_source_pdfs():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    launch()

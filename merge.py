@@ -6,7 +6,6 @@ from fpdf import FPDF
 
 MERGED_PDF_FILENAME = "merged.pdf"
 TEMP_NUMBERED_PDF_FILENAME = "temp_numbered.pdf"
-NUMBERED_PDF_FILENAME = "numbered.pdf"
 
 
 # https://pyfpdf.github.io/fpdf2/Tutorial.html#tuto-2-header-footer-page-break-and-image
@@ -25,14 +24,15 @@ class NumberedPDF(FPDF):
         self.cell(0, 10, f'{self.page_no()}', 0, 0, 'C')
 
 
-def merge_and_number(source_pdfs: typing.Iterable[str]):
+def merge_and_number(source_pdfs: typing.List[str], output_file: typing.Optional[typing.TextIO]):
+    # todo: try catch finally
     merged_pdf = _merge(source_pdfs)
     numbered_pdf_template = _generate_numbered_pdf_template(merged_pdf.getNumPages())
-    _add_page_numbers_to_merged_pdfs(numbered_pdf_template, merged_pdf)
+    _add_page_numbers_to_merged_pdfs(numbered_pdf_template, merged_pdf, output_file)
     _cleanup()
 
 
-def _merge(source_pdfs: typing.Iterable[str]) -> PyPDF2.PdfFileReader:
+def _merge(source_pdfs: typing.List[str]) -> PyPDF2.PdfFileReader:
     merged_pdf = PyPDF2.PdfFileMerger()
     for x in source_pdfs:
         p = PyPDF2.PdfFileReader(x)
@@ -53,7 +53,8 @@ def _generate_numbered_pdf_template(total_pages: int) -> PyPDF2.PdfFileReader:
     return PyPDF2.PdfFileReader(TEMP_NUMBERED_PDF_FILENAME)
 
 
-def _add_page_numbers_to_merged_pdfs(numbered_pdf_template: PyPDF2.PdfFileReader, merged_pdf: PyPDF2.PdfFileReader):
+def _add_page_numbers_to_merged_pdfs(numbered_pdf_template: PyPDF2.PdfFileReader, merged_pdf: PyPDF2.PdfFileReader,
+                                     output_file: typing.Optional[typing.TextIO]):
     final_pdf = PyPDF2.PdfFileWriter()
 
     for x, page in enumerate(numbered_pdf_template.pages):
@@ -61,10 +62,10 @@ def _add_page_numbers_to_merged_pdfs(numbered_pdf_template: PyPDF2.PdfFileReader
         p.mergePage(page)
         final_pdf.addPage(p)
 
-    with open(NUMBERED_PDF_FILENAME, "wb") as o:
-        final_pdf.write(o)
+    final_pdf.write(output_file)
 
 
 def _cleanup():
+    # todo: check if file exists
     os.remove(MERGED_PDF_FILENAME)
     os.remove(TEMP_NUMBERED_PDF_FILENAME)
