@@ -1,6 +1,12 @@
 import os
+import typing
+
 import PyPDF2
 from fpdf import FPDF
+
+MERGED_PDF_FILENAME = "merged.pdf"
+TEMP_NUMBERED_PDF_FILENAME = "temp_numbered.pdf"
+NUMBERED_PDF_FILENAME = "numbered.pdf"
 
 
 # https://pyfpdf.github.io/fpdf2/Tutorial.html#tuto-2-header-footer-page-break-and-image
@@ -20,33 +26,55 @@ class NumberedPDF(FPDF):
 
 
 def main():
-    pdfs = [PyPDF2.PdfFileReader(f'{x + 1}.pdf') for x in range(5)]
+    source_pdfs = get_source_pdfs()
+
+    merge_source_pdfs(source_pdfs)
+
+    merged_pdf = PyPDF2.PdfFileReader(MERGED_PDF_FILENAME)
+
+    numbered_pdf_template(merged_pdf.getNumPages())
+
+    add_page_numbers_to_merged_pdfs(merged_pdf)
+
+    cleanup()
+
+
+def get_source_pdfs():
+    return [PyPDF2.PdfFileReader(f'{x + 1}.pdf') for x in range(5)]
+
+
+def merge_source_pdfs(pdfs: typing.List):
     output = PyPDF2.PdfFileMerger()
     for x in pdfs:
         output.append(x)
 
-    with open("merged.pdf", "wb") as o:
+    with open(MERGED_PDF_FILENAME, "wb") as o:
         output.write(o)
 
-    merged_pdf = PyPDF2.PdfFileReader("merged.pdf")
-    numbered_pdf = NumberedPDF(merged_pdf.getNumPages())
-    for page in range(merged_pdf.getNumPages()):
-        numbered_pdf.add_page()
 
-    numbered_pdf.output("temp_numbered.pdf")
+def numbered_pdf_template(total_pages):
+    temp_numbered_pdf = NumberedPDF(total_pages)
+    for page in range(total_pages):
+        temp_numbered_pdf.add_page()
+    temp_numbered_pdf.output(TEMP_NUMBERED_PDF_FILENAME)
 
-    numbered_pdf = PyPDF2.PdfFileReader("temp_numbered.pdf")
+
+def add_page_numbers_to_merged_pdfs(merged_pdf):
+    numbered_pdf = PyPDF2.PdfFileReader(TEMP_NUMBERED_PDF_FILENAME)
     final_pdf = PyPDF2.PdfFileWriter()
+
     for x, page in enumerate(numbered_pdf.pages):
         p: PyPDF2.pdf.PageObject = merged_pdf.getPage(x)
         p.mergePage(page)
         final_pdf.addPage(p)
 
-    os.remove("merged.pdf")
-    os.remove("temp_numbered.pdf")
-
-    with open("numbered.pdf", "wb") as o:
+    with open(NUMBERED_PDF_FILENAME, "wb") as o:
         final_pdf.write(o)
+
+
+def cleanup():
+    os.remove(MERGED_PDF_FILENAME)
+    os.remove(TEMP_NUMBERED_PDF_FILENAME)
 
 
 if __name__ == "__main__":
