@@ -38,6 +38,7 @@ class Application(tk.Frame):
         self.merge_and_save["command"] = self.save
         self.merge_and_save.grid(row=0, column=2)
 
+        # todo: scrollable
         self.file_container = tk.Frame(self.master)
         self.file_container.pack(side="top", fill="both", expand=True)
 
