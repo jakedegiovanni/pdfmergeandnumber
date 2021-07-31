@@ -1,5 +1,6 @@
 import typing
 
+import tkscrolledframe as tksf
 import tkinter as tk
 from tkinter import filedialog as fd
 
@@ -10,7 +11,9 @@ class Application(tk.Frame):
     quit: tk.Button
     import_files: tk.Button
     merge_and_save: tk.Button
+    scroll_frame: tksf.ScrolledFrame
     file_container: tk.Frame
+    scrollbar: tk.Scrollbar
 
     files: typing.Set
     to_save: typing.List
@@ -38,9 +41,12 @@ class Application(tk.Frame):
         self.merge_and_save["command"] = self.save
         self.merge_and_save.grid(row=0, column=2)
 
-        # todo: scrollable
-        self.file_container = tk.Frame(self.master)
-        self.file_container.pack(side="top", fill="both", expand=True)
+        self.scroll_frame = tksf.ScrolledFrame(self.master)
+        self.scroll_frame.pack(side="top", expand=True, fill="both")
+        self.scroll_frame.bind_scroll_wheel(self.master)
+        self.scroll_frame.bind_arrow_keys(self.master)
+
+        self.file_container = self.scroll_frame.display_widget(tk.Frame)
 
     # https://stackoverflow.com/questions/44887576/how-can-i-create-a-drag-and-drop-interface
     def draggable(self, widget: tk.Widget):
