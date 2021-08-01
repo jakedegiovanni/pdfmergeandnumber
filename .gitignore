@@ -5,10 +5,10 @@
 # development
 venv
 __pycache__
+.pytest_cache
 
 # pyinstaller
 build
-dist
 *.spec
 
 # files
