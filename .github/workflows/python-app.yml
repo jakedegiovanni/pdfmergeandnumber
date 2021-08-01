@@ -33,15 +33,15 @@ jobs:
 #    - name: Test with pytest
 #      run: |
 #        pytest
-    - name: Build Release - MacOS
+    - name: Build Release
+      run: pyinstaller --onefile --windowed pdfmergeandnumber.py
+    - name: Copy Release - MacOS
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        pyinstaller --onefile --windowed pdfmergeandnumber.py
         cp dist/pdfmergeandnumber release/macos
-    - name: Build Release - Windows
+    - name: Copy Release - Windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
-        pyinstaller --onefile --windowed pdfmergeandnumber.py
         copy dist\pdfmergeandnumber.exe release\windows\
     - name: Commit and Push Release
       run: |
