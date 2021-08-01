@@ -164,4 +164,5 @@ class Application(tk.Frame):
 def launch() -> Application:
     root = tk.Tk()
     root.geometry("500x500")
+    root.title("PDF Merge and Number")
     return Application(master=root)
