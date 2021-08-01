@@ -77,15 +77,34 @@ class Application(tk.Frame):
         widget_container_grid_info = widget_container.grid_info()
         target_container_grid_info = target_container.grid_info()
 
-        widget_container.grid(row=target_container_grid_info["row"], column=target_container_grid_info["column"])
-        target_container.grid(row=widget_container_grid_info["row"], column=widget_container_grid_info["column"])
+        widget_grid_keys = widget_container_grid_info.keys()
+        if "row" not in widget_grid_keys or "column" not in widget_grid_keys:
+            return
 
-        widget_container.winfo_children()[0]["text"] = target_container_grid_info["row"] + 1
-        target_container.winfo_children()[0]["text"] = widget_container_grid_info["row"] + 1
+        target_grid_keys = target_container_grid_info.keys()
+        if "row" not in target_grid_keys or "column" not in target_grid_keys:
+            return
 
-        temp = self.to_save[target_container_grid_info["row"]]
-        self.to_save[target_container_grid_info["row"]] = self.to_save[widget_container_grid_info["row"]]
-        self.to_save[widget_container_grid_info["row"]] = temp
+        widget_children = widget_container.winfo_children()
+        if len(widget_children) < 3 or "text" not in widget_children[0].keys():
+            return
+
+        target_children = target_container.winfo_children()
+        if len(target_children) < 3 or "text" not in target_children[0].keys():
+            return
+
+        try:
+            widget_container.grid(row=target_container_grid_info["row"], column=target_container_grid_info["column"])
+            target_container.grid(row=widget_container_grid_info["row"], column=widget_container_grid_info["column"])
+
+            widget_children[0]["text"] = target_container_grid_info["row"] + 1
+            target_children[0]["text"] = widget_container_grid_info["row"] + 1
+
+            temp = self.to_save[target_container_grid_info["row"]]
+            self.to_save[target_container_grid_info["row"]] = self.to_save[widget_container_grid_info["row"]]
+            self.to_save[widget_container_grid_info["row"]] = temp
+        except Exception as e:
+            print(e)
 
     def save(self):
         f = fd.asksaveasfile(mode="wb", filetypes=[("PDF Files", ".pdf")])
@@ -95,6 +114,11 @@ class Application(tk.Frame):
         merge.merge_and_number(self.to_save, f)
 
         f.close()
+
+        for x in self.file_container.winfo_children():
+            x.destroy()
+
+        self.to_save = []
 
     def files_chooser(self):
         file_paths = fd.askopenfilenames(filetypes=[("PDF Files", ".pdf")])
@@ -110,7 +134,7 @@ class Application(tk.Frame):
             x.destroy()
 
         for i, f in enumerate(self.files):
-            container = tk.Frame(self.file_container)
+            container = tk.Frame(self.file_container, borderwidth=2, relief="sunken")
 
             pos = tk.Label(container, text=f"{i + 1}")
             pos.grid(row=0, column=0)
@@ -131,6 +155,7 @@ class Application(tk.Frame):
     def remove_file(self, file, container):
         def inner_func():
             self.files.remove(file)
+            self.to_save.remove(file)
             container.destroy()
 
         return inner_func

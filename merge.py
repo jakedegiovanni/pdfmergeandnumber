@@ -1,4 +1,5 @@
 import os
+import os.path
 import typing
 
 import PyPDF2
@@ -24,12 +25,15 @@ class NumberedPDF(FPDF):
         self.cell(0, 10, f'{self.page_no()}', 0, 0, 'C')
 
 
-def merge_and_number(source_pdfs: typing.List[str], output_file: typing.Optional[typing.TextIO]):
-    # todo: try catch finally
-    merged_pdf = _merge(source_pdfs)
-    numbered_pdf_template = _generate_numbered_pdf_template(merged_pdf.getNumPages())
-    _add_page_numbers_to_merged_pdfs(numbered_pdf_template, merged_pdf, output_file)
-    _cleanup()
+def merge_and_number(source_pdfs: typing.List[str], output_file: typing.TextIO):
+    try:
+        merged_pdf = _merge(source_pdfs)
+        numbered_pdf_template = _generate_numbered_pdf_template(merged_pdf.getNumPages())
+        _add_page_numbers_to_merged_pdfs(numbered_pdf_template, merged_pdf, output_file)
+    except Exception as e:
+        print(e)
+    finally:
+        _cleanup()
 
 
 def _merge(source_pdfs: typing.List[str]) -> PyPDF2.PdfFileReader:
@@ -54,7 +58,7 @@ def _generate_numbered_pdf_template(total_pages: int) -> PyPDF2.PdfFileReader:
 
 
 def _add_page_numbers_to_merged_pdfs(numbered_pdf_template: PyPDF2.PdfFileReader, merged_pdf: PyPDF2.PdfFileReader,
-                                     output_file: typing.Optional[typing.TextIO]):
+                                     output_file: typing.TextIO):
     final_pdf = PyPDF2.PdfFileWriter()
 
     for x, page in enumerate(numbered_pdf_template.pages):
@@ -66,6 +70,7 @@ def _add_page_numbers_to_merged_pdfs(numbered_pdf_template: PyPDF2.PdfFileReader
 
 
 def _cleanup():
-    # todo: check if file exists
-    os.remove(MERGED_PDF_FILENAME)
-    os.remove(TEMP_NUMBERED_PDF_FILENAME)
+    if os.path.isfile(MERGED_PDF_FILENAME):
+        os.remove(MERGED_PDF_FILENAME)
+    if os.path.isfile(TEMP_NUMBERED_PDF_FILENAME):
+        os.remove(TEMP_NUMBERED_PDF_FILENAME)
