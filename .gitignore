@@ -9,6 +9,7 @@ __pycache__
 
 # pyinstaller
 build
+dist
 *.spec
 
 # files
