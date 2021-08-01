@@ -1,7 +1,15 @@
+# idea
 .idea
 *.iml
 
+# development
 venv
 __pycache__
 
+# pyinstaller
+build
+dist
+*.spec
+
+# files
 *.pdf
