@@ -33,16 +33,18 @@ jobs:
 #    - name: Test with pytest
 #      run: |
 #        pytest
-    - name: Build Release
-      run: pyinstaller --onefile --windowed pdfmergeandnumber.py
-    - name: Copy Release - MacOS
+    - name: Build Release - MacOS
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        cp dist/pdfmergeandnumber release/macos
-    - name: Copy Release - Windows
+        pyinstaller --onefile --windowed --name pdfmergeandnumber-mac pdfmergeandnumber.py
+        rm release/macos/*
+        cp dist/pdfmergeandnumber-mac release/macos
+    - name: Build Release - Windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
-        copy dist\pdfmergeandnumber.exe release\windows\
+        pyinstaller --onefile --windowed --name pdfmergeandnumber-win pdfmergeandnumber.py
+        del release\windows\*.exe /s
+        copy dist\pdfmergeandnumber-win.exe release\windows\
     - name: Commit and Push Release
       run: |
         git pull
