@@ -43,8 +43,8 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
         pyinstaller --onefile --windowed --name pdfmergeandnumber-win pdfmergeandnumber.py
-        del /s release\windows\*.exe
-        copy dist\pdfmergeandnumber-win.exe release\windows\
+        rm release/windows/*.exe
+        cp dist/pdfmergeandnumber-win.exe release/windows
     - name: Commit and Push Release
       run: |
         git pull
