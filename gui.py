@@ -4,8 +4,6 @@ import tkscrolledframe as tksf
 import tkinter as tk
 from tkinter import filedialog as fd
 
-import merge
-
 
 class Application(tk.Frame):
     quit: tk.Button
@@ -18,7 +16,9 @@ class Application(tk.Frame):
     files: typing.Set
     to_save: typing.List
 
-    def __init__(self, master=None):
+    save_callback: typing.Callable[[typing.List[str], typing.TextIO], None]
+
+    def __init__(self, save_callback, master=None):
         super().__init__(master)
         self.master = master
         self.pack()
@@ -26,6 +26,8 @@ class Application(tk.Frame):
 
         self.files = set()
         self.to_save = []
+
+        self.save_callback = save_callback
 
     def create_widgets(self):
         self.quit = tk.Button(self, text="Quit", fg="red", command=self.master.destroy)
@@ -111,7 +113,7 @@ class Application(tk.Frame):
         if f is None:
             return
 
-        merge.merge_and_number(self.to_save, f)
+        self.save_callback(self.to_save, f)
 
         f.close()
 
@@ -161,8 +163,8 @@ class Application(tk.Frame):
         return inner_func
 
 
-def launch() -> Application:
+def launch(save_callback) -> Application:
     root = tk.Tk()
     root.geometry("500x500")
     root.title("PDF Merge and Number")
-    return Application(master=root)
+    return Application(save_callback, master=root)

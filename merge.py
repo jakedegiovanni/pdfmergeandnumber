@@ -25,7 +25,7 @@ class NumberedPDF(FPDF):
         self.cell(0, 10, f'{self.page_no()}', 0, 0, 'C')
 
 
-def merge_and_number(source_pdfs: typing.List[str], output_file: typing.TextIO):
+def merge_and_number(source_pdfs: typing.List[str], output_file: typing.TextIO) -> None:
     try:
         merged_pdf = _merge(source_pdfs)
         numbered_pdf_template = _generate_numbered_pdf_template(merged_pdf.getNumPages())
