@@ -37,7 +37,7 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
         pyinstaller --onefile --windowed --name pdfmergeandnumber-mac pdfmergeandnumber.py
-        rm release/macos/*
+        rm -rf release/macos/*
         cp dist/pdfmergeandnumber-mac release/macos
         cp -r dist/*.app release/macos
         zip -vr pdfmergeandnumber-app-mac.zip release/macos/*.app
