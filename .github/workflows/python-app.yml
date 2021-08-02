@@ -41,6 +41,7 @@ jobs:
         cp dist/pdfmergeandnumber-mac release/macos
         cp -r dist/*.app release/macos
         zip -vr pdfmergeandnumber-app-mac.zip release/macos/*.app
+        cp pdfmergeandnumber-app-mac.zip release/macos
     - name: Build Release - Windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
