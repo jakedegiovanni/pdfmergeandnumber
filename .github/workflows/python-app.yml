@@ -39,6 +39,8 @@ jobs:
         pyinstaller --onefile --windowed --name pdfmergeandnumber-mac pdfmergeandnumber.py
         rm release/macos/*
         cp dist/pdfmergeandnumber-mac release/macos
+        cp -r dist/*.app release/macos
+        zip -vr pdfmergeandnumber-app-mac.zip release/macos/*.app
     - name: Build Release - Windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
