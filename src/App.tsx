@@ -1,12 +1,13 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import FilePicker from './components/FilePicker.component';
 
 function App() {
   return (
     <div className="App">
       <main>
-        <div>hello world</div>
+        <FilePicker />
       </main>
     </div>
   );
