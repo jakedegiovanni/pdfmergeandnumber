@@ -1,20 +1,15 @@
 import React from 'react';
 
-export class FileRepresentation {
-    public file: File;
-    public dataUrl: string;
-
-    constructor(file: File, dataUrl: string) {
-        this.file = file;
-        this.dataUrl = dataUrl;
-    }
+export interface FileRepresentation {
+    file: File;
+    dataUrl: string;
 }
 
 interface FileViewerProps {
     r: FileRepresentation
 }
 
-const FileViwer = (props: FileViewerProps) => {
+const FileViewer = (props: FileViewerProps) => {
     return (
         <div>
             <span>{props.r.file.name}</span>
@@ -25,4 +20,4 @@ const FileViwer = (props: FileViewerProps) => {
     );
 };
 
-export default FileViwer;
+export default FileViewer;
