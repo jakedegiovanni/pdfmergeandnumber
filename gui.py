@@ -8,6 +8,7 @@ from tkinter import filedialog as fd
 class Application(tk.Frame):
     quit: tk.Button
     import_files: tk.Button
+    merge_number_and_save: tk.Button
     merge_and_save: tk.Button
     scroll_frame: tksf.ScrolledFrame
     file_container: tk.Frame
@@ -16,7 +17,7 @@ class Application(tk.Frame):
     files: typing.Set
     to_save: typing.List
 
-    save_callback: typing.Callable[[typing.List[str], typing.TextIO], None]
+    save_callback: typing.Callable[[typing.List[str], typing.TextIO, bool], None]
 
     def __init__(self, save_callback, master=None):
         super().__init__(master)
@@ -38,10 +39,15 @@ class Application(tk.Frame):
         self.import_files["command"] = self.files_chooser
         self.import_files.grid(row=0, column=1)
 
+        self.merge_number_and_save = tk.Button(self)
+        self.merge_number_and_save["text"] = "Merge, Number and Save"
+        self.merge_number_and_save["command"] = self.save(True)
+        self.merge_number_and_save.grid(row=0, column=2)
+
         self.merge_and_save = tk.Button(self)
-        self.merge_and_save["text"] = "Merge, Number and Save"
-        self.merge_and_save["command"] = self.save
-        self.merge_and_save.grid(row=0, column=2)
+        self.merge_and_save["text"] = "Merge and Save"
+        self.merge_and_save["command"] = self.save(False)
+        self.merge_and_save.grid(row=0, column=3)
 
         self.scroll_frame = tksf.ScrolledFrame(self.master)
         self.scroll_frame.pack(side="top", expand=True, fill="both")
@@ -108,19 +114,22 @@ class Application(tk.Frame):
         except Exception as e:
             print(e)
 
-    def save(self):
-        f = fd.asksaveasfile(mode="wb", filetypes=[("PDF Files", ".pdf")])
-        if f is None:
-            return
+    def save(self, add_numbers):
+        def x():
+            f = fd.asksaveasfile(mode="wb", filetypes=[("PDF Files", ".pdf")])
+            if f is None:
+                return
 
-        self.save_callback(self.to_save, f)
+            self.save_callback(self.to_save, f, add_numbers)
 
-        f.close()
+            f.close()
 
-        for x in self.file_container.winfo_children():
-            x.destroy()
+            for x in self.file_container.winfo_children():
+                x.destroy()
 
-        self.to_save = []
+            self.to_save = []
+        
+        return x
 
     def files_chooser(self):
         file_paths = fd.askopenfilenames(filetypes=[("PDF Files", ".pdf")])
